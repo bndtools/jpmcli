@@ -1,0 +1,54 @@
+-conditionalpackage: \
+	aQute.*,\
+	org.boris.winrun4j.*,\
+	org.osgi.*
+
+-digests: MD5, SHA1
+
+-privatepackage: \
+	aQute.jpm.*,\
+	org.slf4j,\
+	org.slf4j.helpers,\
+	org.slf4j.impl,\
+	org.slf4j.spi
+
+-sources: false
+
+Bundle-Description: jpm is Just another Package Manager for Java. It stills the envy of all \
+	Java developers of Ruby with their Gems, Perl with its cpan, and Python with its pips. jpm makes \
+	it very easy to install Java applications on a myriad of platforms. Any jar that has a main \
+	method can easily be installed through this program from the command line. Further, \
+	jpm supports a service model that allows programs to be started when the system boots \
+	and stopped before the system exits. The command provide extensive diagnostices. To get \
+	started, visit the website or type jpm help.
+
+Bundle-Developers: \
+	pkriens; \
+		email=Peter.Kriens@aQute.biz; \
+		name="Peter Kriens"; \
+		organization=aQute; \
+		organizationUrl=http://bndtools.org; \
+		roles="architect,developer"; \
+		timezone=1, \
+	gamerson; \
+		email=gregory.amerson@liferay.com; \
+		name="Gregory Amerson"; \
+		organization=Liferay; \
+		organizationUrl=https://www.liferay.com; \
+		roles="developer"; \
+		timezone=-5
+
+Bundle-DocURL:		http://bndtools.org
+
+Bundle-License:		http://www.opensource.org/licenses/apache2.0.php; \
+						description="${Bundle-Copyright}"; \
+						link=LICENSE
+Bundle-Vendor:		bndtools.org
+
+Import-Package: \
+	org.osgi.framework;resolution:=optional,\
+	*
+
+JPM-Command:					jpm
+
+Main-Class: 					aQute.jpm.main.Main
