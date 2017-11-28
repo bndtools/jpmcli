@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
         <key>Label</key>
-        <string>org.jpm4j.run</string>
+        <string>org.bndtools.jpm.run</string>
         <key>OnDemand</key>
         <false/>
         <key>Program</key>

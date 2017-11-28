@@ -55,7 +55,7 @@ public class Windows extends Platform {
 		if (sysdrive == null)
 			sysdrive = "c:";
 
-		return IO.getFile(sysdrive + "\\JPM4J");
+		return IO.getFile(sysdrive + "\\JPM");
 	}
 
 	/**
@@ -178,7 +178,7 @@ public class Windows extends Platform {
 
 	/**
 	 * Return the File to the exe file.
-	 * 
+	 *
 	 * @param data
 	 */
 	protected String getExecutable(CommandData data) {
@@ -242,7 +242,7 @@ public class Windows extends Platform {
 
 	/**
 	 * Provide as much detail about the jpm environment as possible.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 
@@ -250,7 +250,7 @@ public class Windows extends Platform {
 
 	/**
 	 * Initialize the directories for windows.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 

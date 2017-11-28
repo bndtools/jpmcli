@@ -70,7 +70,7 @@ import aQute.struct.struct.Error;
 /**
  * The command line interface to JPM
  */
-@Description("Just Another Package Manager (for Java)\nMaintains a local repository of Java jars (apps or libs). Can automatically link these jars to an OS command or OS service. For more information see https://www.jpm4j.org/#!/md/jpm")
+@Description("Just Another Package Manager (for Java)\nMaintains a local repository of Java jars (apps or libs). Can automatically link these jars to an OS command or OS service. For more information see http://jpm.bndtools.org")
 public class Main extends ReporterAdapter {
 	private final static Logger	logger			= LoggerFactory.getLogger(Main.class);
 	private static final String	JPM_CONFIG_BIN	= "jpm.config.bin";
@@ -102,7 +102,7 @@ public class Main extends ReporterAdapter {
 
 	/**
 	 * Default constructor
-	 * 
+	 *
 	 * @throws UnsupportedEncodingException
 	 */
 
@@ -114,7 +114,7 @@ public class Main extends ReporterAdapter {
 
 	/**
 	 * Main entry
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public static void main(String args[]) throws Exception {
@@ -285,7 +285,7 @@ public class Main extends ReporterAdapter {
 
 	/**
 	 * Initialize the repository and other global vars.
-	 * 
+	 *
 	 * @param opts the options
 	 * @throws IOException
 	 */
@@ -444,7 +444,7 @@ public class Main extends ReporterAdapter {
 		/**
 		 * Install a file and extra commands
 		 */
-		@Description("Install jar without resolving dependencies with http://www.jpm4j.org")
+		@Description("Install jar without resolving dependencies")
 		boolean local();
 
 		/**
@@ -458,7 +458,7 @@ public class Main extends ReporterAdapter {
 	 * A better way to install
 	 */
 
-	@Description("Install an artifact from a url, file, or http://www.jpm4j.org")
+	@Description("Install an artifact from a url, file, or Maven central")
 	public void _install(installOptions opts) throws Exception {
 
 		if (!this.options.user() && !jpm.hasAccess()) {
@@ -512,7 +512,7 @@ public class Main extends ReporterAdapter {
 		}
 	}
 
-	@Description("Manage the jpm4j services")
+	@Description("Manage the jpm services")
 	public void _service(ServiceOptions opts) throws Exception {
 		if (opts._arguments().isEmpty()) {
 			for (ServiceData sd : jpm.getServices())
@@ -694,7 +694,7 @@ public class Main extends ReporterAdapter {
 		out.printf("%-40s (%s) %s%n", sd.name, s.isRunning() ? "runs   " : "stopped", sd.args);
 	}
 
-	@Description("Manage the jpm4j commands")
+	@Description("Manage the jpm commands")
 	public void _command(CommandOptions opts) throws Exception {
 
 		if (opts.remove()) {
@@ -792,7 +792,7 @@ public class Main extends ReporterAdapter {
 
 	/**
 	 * Main entry for the command line
-	 * 
+	 *
 	 * @param args
 	 * @throws Exception
 	 */
@@ -807,7 +807,7 @@ public class Main extends ReporterAdapter {
 
 	/**
 	 * Setup jpm to run on this system.
-	 * 
+	 *
 	 */
 	@Description("Install jpm on the current system")
 	interface InitOptions extends Options {}
@@ -897,7 +897,7 @@ public class Main extends ReporterAdapter {
 
 	/**
 	 * Show the platform info.
-	 * 
+	 *
 	 * @param opts
 	 * @throws IOException
 	 * @throws Exception
@@ -958,7 +958,7 @@ public class Main extends ReporterAdapter {
 
 	/**
 	 * Start a service.
-	 * 
+	 *
 	 * @param options
 	 * @throws Exception
 	 */
@@ -997,7 +997,7 @@ public class Main extends ReporterAdapter {
 
 	/**
 	 * Restart a service.
-	 * 
+	 *
 	 * @param options
 	 * @throws Exception
 	 */
@@ -1032,7 +1032,7 @@ public class Main extends ReporterAdapter {
 
 	/**
 	 * Trace a service.
-	 * 
+	 *
 	 * @param options
 	 * @throws Exception
 	 */
@@ -1065,7 +1065,7 @@ public class Main extends ReporterAdapter {
 
 	/**
 	 * Stop a service.
-	 * 
+	 *
 	 * @param options
 	 * @throws Exception
 	 */
@@ -1101,7 +1101,7 @@ public class Main extends ReporterAdapter {
 
 	/**
 	 * Status a service.
-	 * 
+	 *
 	 * @param options
 	 * @throws InterruptedException
 	 */
@@ -1139,7 +1139,7 @@ public class Main extends ReporterAdapter {
 
 	/**
 	 * Show the current version
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Description("Show the current version of jpm")
@@ -1951,7 +1951,7 @@ public class Main extends ReporterAdapter {
 
 	/**
 	 * Start jpm as daemon
-	 * 
+	 *
 	 * @throws Exception
 	 */
 

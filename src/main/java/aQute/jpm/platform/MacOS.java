@@ -95,9 +95,9 @@ class MacOS extends Unix {
 
 	@Override
 	public void installDaemon(boolean user) throws IOException {
-		String dest = "~/Library/LaunchAgents/org.jpm4j.run.plist";
+		String dest = "~/Library/LaunchAgents/org.bndtools.jpm.run.plist";
 		if (!user) {
-			dest = "/Library/LaunchAgents/org.jpm4j.run.plist";
+			dest = "/Library/LaunchAgents/org.bndtools.jpm.run.plist";
 		}
 		IO.copy(getClass().getResource("macos/daemon.plist"), IO.getFile(dest));
 	}
@@ -105,9 +105,9 @@ class MacOS extends Unix {
 	@Override
 	public void uninstallDaemon(boolean user) throws IOException {
 		if (user)
-			IO.delete(new File("~/Library/LaunchAgents/org.jpm4j.run.plist"));
+			IO.delete(new File("~/Library/LaunchAgents/org.bndtools.jpm.run.plist"));
 		else
-			IO.delete(new File("/Library/LaunchAgents/org.jpm4j.run.plist"));
+			IO.delete(new File("/Library/LaunchAgents/org.bndtools.jpm.run.plist"));
 	}
 
 	@Override
@@ -123,7 +123,7 @@ class MacOS extends Unix {
 
 	/**
 	 * Return the VMs on the platform.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Override
@@ -132,10 +132,13 @@ class MacOS extends Unix {
 				"/System/Library/Java/JavaVirtualMachines", "/Library/Java/JavaVirtualMachines"
 		};
 		for (String path : paths) {
-			for (File vmdir : new File(path).listFiles()) {
-				JVM jvm = getJVM(vmdir);
-				if (jvm != null)
-					vms.add(jvm);
+			File[] vmFiles = new File(path).listFiles();
+			if (vmFiles != null) {
+				for (File vmdir : vmFiles) {
+					JVM jvm = getJVM(vmdir);
+					if (jvm != null)
+						vms.add(jvm);
+				}
 			}
 		}
 	}

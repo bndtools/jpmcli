@@ -1068,7 +1068,6 @@ public class JustAnotherPackageManager {
 				f.format("Created\t0: %s%n", dateFormat.format(new Date(revision.created)));
 				f.format("Size\t0: %d%n", revision.size);
 				f.format("Sha\t0: %s%n", Hex.toHexString(revision._id));
-				f.format("URL\t0: %s%n", createJpmLink(revision));
 				f.format("%n");
 				f.format("%s%n", revision.description);
 				f.format("%n");
@@ -1098,10 +1097,6 @@ public class JustAnotherPackageManager {
 
 	private String createCoord(RevisionRef rev) {
 		return String.format("%s:%s@%s [%s]", rev.groupId, rev.artifactId, rev.version, rev.phase);
-	}
-
-	private String createJpmLink(Revision rev) {
-		return String.format("http://jpm4j.org/#!/p/sha/%s//%s", Hex.toHexString(rev._id), rev.baseline);
 	}
 
 	public class UpdateMemo {
