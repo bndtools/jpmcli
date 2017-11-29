@@ -5,13 +5,17 @@ package aQute.jpm.platform;
  */
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Formatter;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.boris.winrun4j.RegistryKey;
 import org.slf4j.Logger;
@@ -40,6 +44,8 @@ import aQute.lib.strings.Strings;
  * TODO services (fortunately, winrun4j has extensive support)
  */
 public class Windows extends Platform {
+	private static final String JRE_KEY_PREFIX = "Software\\JavaSoft\\Java Runtime Environment";
+	private static final String JDK_KEY_PREFIX = "Software\\JavaSoft\\Java Development Kit";
 	private final static Logger	logger	= LoggerFactory.getLogger(Windows.class);
 	static boolean	IS64	= System.getProperty("os.arch").contains("64");
 
@@ -344,14 +350,79 @@ public class Windows extends Platform {
 
 	@Override
 	public void getVMs(Collection<JVM> vms) throws Exception {
-		// TODO Auto-generated method stub
+		findJavaHomes(vms, JRE_KEY_PREFIX);
+		findJavaHomes(vms, JDK_KEY_PREFIX);
+	}
 
+	private void findJavaHomes(Collection<JVM> vms, String prefix) throws Exception {
+		List<String> subKeys = WinRegistry.readStringSubKeys(WinRegistry.HKEY_LOCAL_MACHINE, prefix);
+
+		if (subKeys != null) {
+			subKeys.stream().map(
+				subKey -> {
+					try {
+						return WinRegistry.readString(WinRegistry.HKEY_LOCAL_MACHINE, prefix + "\\" + subKey, "JavaHome");
+					} catch (Throwable t) {
+						return null;
+					}
+				}
+			).filter(
+				javaHome -> javaHome != null
+			).distinct(
+			).map(
+				File::new
+			).map(javaHome -> {
+				try {
+					return getJVM(javaHome);
+				}
+				catch (Throwable t) {
+					return null;
+				}
+			}).filter(
+				jvm -> jvm != null
+			).forEach(
+				vms::add
+			);
+		}
 	}
 
 	@Override
-	public JVM getJVM(File f) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public JVM getJVM(File vmdir) throws Exception {
+		if (!vmdir.isDirectory()) {
+			return null;
+		}
+
+		File binDir = new File(vmdir, "bin");
+		if (!binDir.isDirectory()) {
+			logger.debug("Found a directory {}, but it does not have the expected bin directory", vmdir);
+			return null;
+		}
+
+		File javaExe = new File(vmdir, "bin/java.exe");
+		if (!javaExe.isFile() || !javaExe.exists()) {
+			logger.debug("Found a directory {}, but it does not have the expected java exe", vmdir);
+			return null;
+		}
+
+		File releaseFile = new File(vmdir, "release");
+		if (!releaseFile.isFile() || !releaseFile.exists()) {
+			logger.debug("Found a directory {}, but it doesn't contain an expected release file", vmdir);
+			return null;
+		}
+
+		try (InputStream is = Files.newInputStream(releaseFile.toPath())) {
+			Properties releaseProps = new Properties();
+			releaseProps.load(is);
+
+			JVM jvm = new JVM();
+			jvm.name = vmdir.getName();
+			jvm.path = vmdir.getCanonicalPath();
+			jvm.platformRoot = vmdir.getCanonicalPath();
+			jvm.version = releaseProps.getProperty("JAVA_VERSION");
+			jvm.platformVersion = jvm.version;
+
+			return jvm;
+		}
 	}
 
 }
