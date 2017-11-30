@@ -122,7 +122,7 @@ public class JustAnotherPackageManager {
 	final Platform				platform;
 	final Reporter				reporter;
 
-	MavenCentral					library;
+	MavenCentralLibrary					library;
 	final List<Service>			startedByDaemon		= new ArrayList<Service>();
 	boolean						localInstall		= false;
 	private URLClient			host;
@@ -963,7 +963,7 @@ public class JustAnotherPackageManager {
 
 		this.host = new URLClient(url.toString());
 		host.setReporter(reporter);
-		library = new MavenCentral(host);
+		library = new MavenCentralLibrary(host);
 	}
 
 	public void close() {
@@ -1018,7 +1018,7 @@ public class JustAnotherPackageManager {
 		return to;
 	}
 
-	public MavenCentral getLibrary() {
+	public MavenCentralLibrary getLibrary() {
 		return library;
 	}
 

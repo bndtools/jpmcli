@@ -1,0 +1,17 @@
+language: java
+
+jdk:
+  - oraclejdk8
+
+before_install:
+  - unset _JAVA_OPTIONS
+
+install:
+  - ./mvnw --version
+
+script:
+  - sudo ./mvnw clean install
+
+cache:
+  directories:
+    - $HOME/.m2/
