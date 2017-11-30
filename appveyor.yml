@@ -10,10 +10,7 @@ install:
   - mvnw.cmd --version
 
 build_script:
-  - mvnw.cmd clean install
-
-on_success:
-  - git status
+  - mvnw.cmd install
 
 cache:
   - C:\Users\appveyor\.m2

@@ -10,7 +10,7 @@ install:
   - ./mvnw --version
 
 script:
-  - sudo ./mvnw clean install
+  - sudo ./mvnw install
 
 cache:
   directories:
