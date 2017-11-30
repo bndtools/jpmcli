@@ -21,7 +21,8 @@ public class JPMTest extends TestCase {
 
 	@Override
 	public void setUp() {
-		settings = new Settings("/tmp/settings");
+		String tempDir = new File(System.getProperty("java.io.tmpdir")).getAbsolutePath();
+		settings = new Settings(tempDir + "/tmp/settings");
 	}
 
 	@Override
@@ -160,22 +161,8 @@ public class JPMTest extends TestCase {
 	 * exec = IO.getFile("/tmp/filemap"); assertFalse(exec.exists()); }
 	 */
 
-	public void testMain() throws Exception {
-		File tmp = new File("tmp");
-		IO.delete(tmp);
-		try {
-			String[] args = {
-					"-exutl", "http://localhost:8080", "-c", "tmp", "i2", "85510D0C5FF172670EF8BC200F4BD169B3D97459"
-			};
-			Main main = new Main();
-			main.run(args);
-		} finally {
-			IO.delete(tmp);
-		}
-	}
-
 	public void testVM() throws Exception {
-		File tmp = new File("tmp");
+		File tmp = new File("target/tmp");
 		IO.delete(tmp);
 		tmp.mkdirs();
 		File home = new File(tmp, "home");

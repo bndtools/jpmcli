@@ -8,9 +8,9 @@ import aQute.service.library.Library.Program;
 import aQute.service.library.Library.Revision;
 import aQute.service.library.Library.RevisionRef;
 
-public class MavenCentral {
+public class MavenCentralLibrary {
 
-	public MavenCentral(URLClient host) {
+	public MavenCentralLibrary(URLClient host) {
 		// TODO Auto-generated constructor stub
 	}
 
