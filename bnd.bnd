@@ -5,7 +5,7 @@
 
 -digests: MD5, SHA1
 
--includeresource: service.jar
+-includeresource: service.jar, NOTICE
 
 -make: service.jar;type=bnd; recipe="service.bnd"
 
@@ -55,5 +55,4 @@ Import-Package: \
 	*
 
 JPM-Command:					jpm
-
 Main-Class: 					aQute.jpm.main.Main
