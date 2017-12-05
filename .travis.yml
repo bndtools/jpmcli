@@ -7,7 +7,8 @@ install:
 - "./mvnw --version"
 script:
 - ./mvnw install
-- sudo ./mvnw -Dtest=ServiceTest test
+- sudo env
+- sudo ./mvnw -Dmaven.repo.local=/home/travis/.m2/repository -Dtest=ServiceTest test
 cache:
   directories:
   - "$HOME/.m2/"
