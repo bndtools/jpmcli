@@ -7,8 +7,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -151,6 +152,25 @@ public class Windows extends Platform {
 				String parts[] = data.jvmArgs.split("\\s+");
 				for (int i = 0; i < parts.length; i++)
 					pw.printf("vmarg.%d=%s%n", i + 1, parts[i]);
+			}
+
+			if (data.jvmLocation != null && data.jvmLocation.length() != 0) {
+				// find the jvm.dll to set as vm.location
+
+				Files.walk(
+					Paths.get(data.jvmLocation)
+				).filter(
+					path -> {
+						String fileName = path.getFileName().toString();
+
+						return fileName.equals("jvm.dll");
+					}
+				).map(
+					Path::toString
+				).findFirst(
+				).ifPresent(
+					path -> pw.printf("vm.location=%s%n", path)
+				);
 			}
 		}
 		logger.debug("Ini content {}", IO.collect(ini));

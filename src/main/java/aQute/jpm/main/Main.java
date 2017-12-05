@@ -486,7 +486,15 @@ public class Main extends ReporterAdapter {
 
 				if (!opts.ignore()) {
 					CommandData cmd = jpm.parseCommandData(artifact);
+
 					updateCommandData(cmd, opts);
+
+					SortedSet<JVM> vms = jpm.getVMs();
+
+					if (vms != null && vms.size() > 0) {
+						cmd.jvmLocation = vms.first().path;
+					}
+
 					logger.debug("main={}, name={}", cmd.main, cmd.name);
 					if (cmd.main != null) {
 						if (cmd.name == null && !artifact.local) {
