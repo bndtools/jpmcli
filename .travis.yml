@@ -15,7 +15,7 @@ after_success:
 - echo $TRAVIS_PULL_REQUEST
 - echo $TRAVIS_BRANCH
 - if [ master == $TRAVIS_BRANCH -a $TRAVIS_PULL_REQUEST == false -a  ${OSSRH_USERNAME:=X}
-  != X ]; then ./mvnw deploy -DskipTests=true --settings travis-settings.xml; fi
+  != X ]; then sudo ./mvnw deploy -DskipTests=true --settings travis-settings.xml; fi
 env:
   global:
   - secure: OMVtGcHnDpzUABwZk3ibYqJKZnDBxFu8T292SIsv8RkYqcgFXsYwRhT16NoZxDmPK8U6eLItIIfl3DeYFJxFgJm6mIQtkHr2AObSvWq9bjByCVvWFmcinUtLYIaWh7xxIETabxqBI3z5nXffwYUXIPnsEWZ11qf9LVwsCLiPhB/AvARybM8kFQME3pnTgQnbYCEK0cJmBzItgBKIvQ6GWgjaDzN+lIyaNKqL01kryaHIKBBVolp0tvcCUvK110QDHv3rz4tb2p1ayS0XM1DonLhx/3fkBw354vQ+yx1oNxhvyOgXAOcvkG8mAjVlI5QmgMq1P2gqA9tmfUFh+Ko8H+19/atgldGOrSG4UA4p6dfLrb1npe1ixK+lPGe81QiomRthIbYazIYVJDS5OGjSmwnMGIKT/rOcHn5o6ci5EJ/veC0NvU3pLiSwxeELUZaLWgv7C8BBy2yPSsfTibN9C8Vuf+5xRHvoAylWP81iknT3BNmdBOSuBh0M2gu6vf7EPvx3f1qxt1mB74yZKqS1iMQP4/aKWHCEt4bmZLM7OFzlZHAwQdnctpXHnMIJXMyMqdgpqA40Hf10Iz+oOnIwP95O1PmKLq1bf5DvBeLFqO4gRayBSG4u/wGeEGyPziuO0yduojTOl5z+cOSKYat/HEFXIgnVThc1TTZzlCdDPUI=
