@@ -12,9 +12,6 @@ cache:
   directories:
   - "$HOME/.m2/"
 after_success:
-- echo $REPOSITORY_USERNAME
-- echo $TRAVIS_PULL_REQUEST
-- echo $TRAVIS_BRANCH
 - if [ master == $TRAVIS_BRANCH -a $TRAVIS_PULL_REQUEST == false -a  ${OSSRH_USERNAME:=X}
   != X ]; then ./mvnw deploy -DskipTests=true --settings travis-settings.xml; fi
 env:
