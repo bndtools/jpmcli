@@ -2,15 +2,6 @@ package aQute.jpm.platform;
 
 import static aQute.lib.io.IO.copy;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.Formatter;
-import java.util.Map;
-
 import aQute.jpm.lib.ArtifactData;
 import aQute.jpm.lib.CommandData;
 import aQute.jpm.lib.JVM;
@@ -22,6 +13,15 @@ import aQute.lib.io.IO;
 import aQute.libg.reporter.ReporterAdapter;
 import aQute.libg.sed.Sed;
 import aQute.service.reporter.Reporter;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Formatter;
+import java.util.Map;
 
 public abstract class Platform {
 	public enum Type {
@@ -35,7 +35,7 @@ public abstract class Platform {
 
 	/**
 	 * Get the current platform manager.
-	 * 
+	 *
 	 * @param reporter
 	 * @param type
 	 */
@@ -72,6 +72,18 @@ public abstract class Platform {
 			return Type.LINUX;
 
 		return null;
+	}
+
+	public static boolean isWindows() {
+		return getPlatformType().equals(Type.WINDOWS);
+	}
+
+	public static boolean isLinux() {
+		return getPlatformType().equals(Type.LINUX);
+	}
+
+	public static boolean isMacos() {
+		return getPlatformType().equals(Type.MACOS);
 	}
 
 	/**
@@ -258,7 +270,7 @@ public abstract class Platform {
 
 	/**
 	 * Is called to initialize the platform if necessary.
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws Exception
 	 */
