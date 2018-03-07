@@ -2,6 +2,37 @@ package aQute.jpm.main;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import aQute.bnd.osgi.Constants;
+import aQute.bnd.osgi.Instructions;
+import aQute.jpm.lib.ArtifactData;
+import aQute.jpm.lib.CommandData;
+import aQute.jpm.lib.JVM;
+import aQute.jpm.lib.JustAnotherPackageManager;
+import aQute.jpm.lib.JustAnotherPackageManager.UpdateMemo;
+import aQute.jpm.lib.Service;
+import aQute.jpm.lib.ServiceData;
+import aQute.jpm.platform.Platform;
+import aQute.lib.base64.Base64;
+import aQute.lib.collections.ExtList;
+import aQute.lib.data.Data;
+import aQute.lib.getopt.Arguments;
+import aQute.lib.getopt.CommandLine;
+import aQute.lib.getopt.Description;
+import aQute.lib.getopt.Options;
+import aQute.lib.hex.Hex;
+import aQute.lib.io.IO;
+import aQute.lib.justif.Justif;
+import aQute.lib.settings.Settings;
+import aQute.lib.strings.Strings;
+import aQute.libg.command.Command;
+import aQute.libg.glob.Glob;
+import aQute.libg.reporter.ReporterAdapter;
+import aQute.service.library.Coordinate;
+import aQute.service.library.Library;
+import aQute.service.library.Library.Program;
+import aQute.service.library.Library.Revision;
+import aQute.struct.struct.Error;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -36,37 +67,6 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import aQute.bnd.osgi.Constants;
-import aQute.bnd.osgi.Instructions;
-import aQute.jpm.lib.ArtifactData;
-import aQute.jpm.lib.CommandData;
-import aQute.jpm.lib.JVM;
-import aQute.jpm.lib.JustAnotherPackageManager;
-import aQute.jpm.lib.JustAnotherPackageManager.UpdateMemo;
-import aQute.jpm.lib.Service;
-import aQute.jpm.lib.ServiceData;
-import aQute.jpm.platform.Platform;
-import aQute.lib.base64.Base64;
-import aQute.lib.collections.ExtList;
-import aQute.lib.data.Data;
-import aQute.lib.getopt.Arguments;
-import aQute.lib.getopt.CommandLine;
-import aQute.lib.getopt.Description;
-import aQute.lib.getopt.Options;
-import aQute.lib.hex.Hex;
-import aQute.lib.io.IO;
-import aQute.lib.justif.Justif;
-import aQute.lib.settings.Settings;
-import aQute.lib.strings.Strings;
-import aQute.libg.command.Command;
-import aQute.libg.glob.Glob;
-import aQute.libg.reporter.ReporterAdapter;
-import aQute.service.library.Coordinate;
-import aQute.service.library.Library;
-import aQute.service.library.Library.Program;
-import aQute.service.library.Library.Revision;
-import aQute.struct.struct.Error;
 /**
  * The command line interface to JPM
  */
@@ -157,6 +157,9 @@ public class Main extends ReporterAdapter {
 	public interface ModifyCommand {
 		@Description("Provide or override the JVM arguments")
 		String jvmargs();
+
+		@Description("Provide or override the JVM location (for Windows only)")
+		String jvmlocation();
 
 		@Description("Provide the name of the main class used to launch this command or service in fully qualified form, e.g. aQute.main.Main")
 		String main();
@@ -257,6 +260,9 @@ public class Main extends ReporterAdapter {
 		@Description("Specify the home directory of jpm. (can also be permanently set with 'jpm settings jpm.home=...'")
 		String home();
 
+		@Description("Provide or override the JVM location when installing jpm (for Windows only)")
+		String jvmlocation();
+
 		@Description("Wait for a key press, might be useful when you want to see the result before it is overwritten by a next command")
 		boolean key();
 
@@ -350,6 +356,11 @@ public class Main extends ReporterAdapter {
 				url = settings.get("library.url");
 
 			jpm = new JustAnotherPackageManager(this, platform, homeDir, binDir);
+
+			if (opts.jvmlocation() != null) {
+				jpm.setJvmLocation(opts.jvmlocation());
+			}
+
 			platform.setJpm(jpm);
 			jpm.setLibrary(url == null ? null : new URI(url));
 
@@ -677,6 +688,10 @@ public class Main extends ReporterAdapter {
 			data.jvmArgs = opts.jvmargs();
 			update = true;
 		}
+		if (opts.jvmlocation() != null) {
+			data.jvmLocation = opts.jvmlocation();
+			update = true;
+		}
 		if (opts.name() != null) {
 			data.name = opts.name();
 			update = true;
@@ -842,7 +857,15 @@ public class Main extends ReporterAdapter {
 				File f = new File(s).getAbsoluteFile();
 				if (f.exists()) {
 					CommandLine cl = new CommandLine(this);
-					String help = cl.execute(this, "install", Arrays.asList("-fl", f.getAbsolutePath()));
+
+					String help = null;
+
+					if (jpm.getJvmLocation() != null) {
+						help = cl.execute(this, "install", Arrays.asList("-fl", "-J", jpm.getJvmLocation(), f.getAbsolutePath()));
+					} else {
+						help = cl.execute(this, "install", Arrays.asList("-fl", f.getAbsolutePath()));
+					}
+
 					if (help != null) {
 						error(help);
 						return;

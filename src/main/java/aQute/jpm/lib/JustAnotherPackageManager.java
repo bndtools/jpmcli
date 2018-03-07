@@ -4,6 +4,31 @@ import static aQute.lib.io.IO.copy;
 import static aQute.lib.io.IO.createTempFile;
 import static aQute.lib.io.IO.rename;
 
+import aQute.bnd.header.Attrs;
+import aQute.bnd.header.OSGiHeader;
+import aQute.bnd.header.Parameters;
+import aQute.bnd.osgi.Constants;
+import aQute.bnd.version.Version;
+import aQute.jpm.platform.Platform;
+import aQute.lib.base64.Base64;
+import aQute.lib.collections.ExtList;
+import aQute.lib.converter.Converter;
+import aQute.lib.hex.Hex;
+import aQute.lib.io.IO;
+import aQute.lib.json.JSONCodec;
+import aQute.lib.justif.Justif;
+import aQute.lib.settings.Settings;
+import aQute.lib.strings.Strings;
+import aQute.libg.cryptography.SHA1;
+import aQute.rest.urlclient.URLClient;
+import aQute.service.library.Coordinate;
+import aQute.service.library.Library;
+import aQute.service.library.Library.Program;
+import aQute.service.library.Library.Revision;
+import aQute.service.library.Library.RevisionRef;
+import aQute.service.reporter.Reporter;
+import aQute.struct.struct;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -39,31 +64,6 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import aQute.bnd.header.Attrs;
-import aQute.bnd.header.OSGiHeader;
-import aQute.bnd.header.Parameters;
-import aQute.bnd.osgi.Constants;
-import aQute.bnd.version.Version;
-import aQute.jpm.platform.Platform;
-import aQute.lib.base64.Base64;
-import aQute.lib.collections.ExtList;
-import aQute.lib.converter.Converter;
-import aQute.lib.hex.Hex;
-import aQute.lib.io.IO;
-import aQute.lib.json.JSONCodec;
-import aQute.lib.justif.Justif;
-import aQute.lib.settings.Settings;
-import aQute.lib.strings.Strings;
-import aQute.libg.cryptography.SHA1;
-import aQute.rest.urlclient.URLClient;
-import aQute.service.library.Coordinate;
-import aQute.service.library.Library;
-import aQute.service.library.Library.Program;
-import aQute.service.library.Library.Revision;
-import aQute.service.library.Library.RevisionRef;
-import aQute.service.reporter.Reporter;
-import aQute.struct.struct;
 
 /**
  * JPM is the Java package manager. It manages a local repository in the user
@@ -127,7 +127,8 @@ public class JustAnotherPackageManager {
 	boolean						localInstall		= false;
 	private URLClient			host;
 	private boolean				underTest			= System.getProperty("jpm.intest") != null;
-	Settings					settings;
+	Settings						settings;
+	private String				jvmLocation = null;
 
 	/**
 	 * Constructor
@@ -641,6 +642,7 @@ public class JustAnotherPackageManager {
 	 */
 	public void daemon() throws Exception {
 		Runtime.getRuntime().addShutdownHook(new Thread("Daemon shutdown") {
+			@Override
 			public void run() {
 
 				for (Service service : startedByDaemon) {
@@ -736,6 +738,7 @@ public class JustAnotherPackageManager {
 		data.busy = true;
 		Runnable r = new Runnable() {
 
+			@Override
 			public void run() {
 				try {
 					put(uri, data);
@@ -1383,5 +1386,13 @@ public class JustAnotherPackageManager {
 		settings.put(JPM_VMS_EXTRA, list);
 		settings.save();
 		return jvm;
+	}
+
+	public void setJvmLocation(String jvmLocation) {
+		this.jvmLocation = jvmLocation;
+	}
+
+	public String getJvmLocation() {
+		return jvmLocation;
 	}
 }
