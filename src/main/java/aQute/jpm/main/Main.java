@@ -12,7 +12,6 @@ import aQute.jpm.lib.JustAnotherPackageManager.UpdateMemo;
 import aQute.jpm.lib.Service;
 import aQute.jpm.lib.ServiceData;
 import aQute.jpm.platform.Platform;
-import aQute.jpm.platform.Platform.Type;
 import aQute.lib.base64.Base64;
 import aQute.lib.collections.ExtList;
 import aQute.lib.data.Data;
@@ -358,7 +357,7 @@ public class Main extends ReporterAdapter {
 
 			jpm = new JustAnotherPackageManager(this, platform, homeDir, binDir);
 
-			if (opts.jvmlocation() != null && Platform.getPlatformType().equals(Type.WINDOWS)) {
+			if (opts.jvmlocation() != null) {
 				jpm.setJvmLocation(opts.jvmlocation());
 			}
 
@@ -689,7 +688,7 @@ public class Main extends ReporterAdapter {
 			data.jvmArgs = opts.jvmargs();
 			update = true;
 		}
-		if (opts.jvmlocation() != null && Platform.isWindows()) {
+		if (opts.jvmlocation() != null) {
 			data.jvmLocation = opts.jvmlocation();
 			update = true;
 		}
@@ -861,7 +860,7 @@ public class Main extends ReporterAdapter {
 
 					String help = null;
 
-					if (jpm.getJvmLocation() != null && Platform.isWindows()) {
+					if (jpm.getJvmLocation() != null) {
 						help = cl.execute(this, "install", Arrays.asList("-fl", "-J", jpm.getJvmLocation(), f.getAbsolutePath()));
 					} else {
 						help = cl.execute(this, "install", Arrays.asList("-fl", f.getAbsolutePath()));
