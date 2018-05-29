@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -129,7 +130,8 @@ public class Windows extends Platform {
 		// Make the ini file
 		//
 		File ini = new File(f.getAbsolutePath().replaceAll("\\.exe$", ".ini"));
-		try (PrintWriter pw = new PrintWriter(ini)) {
+		Charset defaultCharset = Charset.defaultCharset();
+		try (PrintWriter pw = new PrintWriter(ini, defaultCharset.name())) {
 			pw.printf("main.class=%s%n", data.main);
 			pw.printf("log.level=error%n");
 			String del = "classpath.1=";
@@ -173,7 +175,7 @@ public class Windows extends Platform {
 				);
 			}
 		}
-		logger.debug("Ini content {}", IO.collect(ini));
+		logger.debug("Ini content {}", IO.collect(ini, defaultCharset));
 		return null;
 	}
 

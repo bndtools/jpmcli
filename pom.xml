@@ -10,6 +10,7 @@
 	<version>${revision}</version>
 
 	<properties>
+		<bnd.version>4.0.0</bnd.version>
 		<revision>4.0.0-SNAPSHOT</revision>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.target>1.8</maven.compiler.target>
@@ -73,12 +74,12 @@
 		<dependency>
 			<groupId>biz.aQute.bnd</groupId>
 			<artifactId>biz.aQute.bndlib</artifactId>
-			<version>3.5.0</version>
+			<version>${bnd.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>biz.aQute.bnd</groupId>
 			<artifactId>biz.aQute.repository</artifactId>
-			<version>3.5.0</version>
+			<version>${bnd.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -118,7 +119,7 @@
 			<plugin>
 				<groupId>biz.aQute.bnd</groupId>
 				<artifactId>bnd-maven-plugin</artifactId>
-				<version>3.5.0</version>
+				<version>${bnd.version}</version>
 				<executions>
 					<execution>
 						<id>default-bnd-process</id>
