@@ -20,7 +20,6 @@ import aQute.lib.justif.Justif;
 import aQute.lib.settings.Settings;
 import aQute.lib.strings.Strings;
 import aQute.libg.cryptography.SHA1;
-import aQute.rest.urlclient.URLClient;
 import aQute.service.library.Coordinate;
 import aQute.service.library.Library;
 import aQute.service.library.Library.Program;
@@ -125,7 +124,6 @@ public class JustAnotherPackageManager {
 	MavenCentralLibrary					library;
 	final List<Service>			startedByDaemon		= new ArrayList<Service>();
 	boolean						localInstall		= false;
-	private URLClient			host;
 	private boolean				underTest			= System.getProperty("jpm.intest") != null;
 	Settings						settings;
 	private String				jvmLocation = null;
@@ -964,9 +962,7 @@ public class JustAnotherPackageManager {
 		if (url == null)
 			url = new URI("http://repo1.maven.org/maven2/");
 
-		this.host = new URLClient(url.toString());
-		host.setReporter(reporter);
-		library = new MavenCentralLibrary(host);
+		library = new MavenCentralLibrary();
 	}
 
 	public void close() {
