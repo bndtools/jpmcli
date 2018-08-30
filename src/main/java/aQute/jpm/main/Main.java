@@ -503,7 +503,17 @@ public class Main extends ReporterAdapter {
 					SortedSet<JVM> vms = jpm.getVMs();
 
 					if (vms != null && vms.size() > 0) {
-						cmd.jvmLocation = vms.first().path;
+						for (JVM vm : vms) {
+							if (vm.path.equals(jpm.getJvmLocation())) {
+								cmd.jvmLocation = vm.path;
+
+								break;
+							}
+						}
+
+						if (cmd.jvmLocation == null) {
+							cmd.jvmLocation = vms.first().path;
+						}
 					}
 
 					logger.debug("main={}, name={}", cmd.main, cmd.name);
@@ -833,7 +843,12 @@ public class Main extends ReporterAdapter {
 	 *
 	 */
 	@Description("Install jpm on the current system")
-	interface InitOptions extends Options {}
+	interface InitOptions extends Options {
+
+		@Description("Provide or override the JVM location (for Windows only)")
+		String jvmlocation();
+
+	}
 
 	@Description("Install jpm on the current system")
 	public void _init(InitOptions opts) throws Exception {
@@ -844,6 +859,10 @@ public class Main extends ReporterAdapter {
 		}
 
 		jpm.getPlatform().init();
+
+		if (opts.jvmlocation() != null) {
+			jpm.setJvmLocation(opts.jvmlocation());
+		}
 
 		try {
 			String s = System.getProperty("java.class.path");
