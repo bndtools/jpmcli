@@ -503,11 +503,13 @@ public class Main extends ReporterAdapter {
 					SortedSet<JVM> vms = jpm.getVMs();
 
 					if (vms != null && vms.size() > 0) {
-						for (JVM vm : vms) {
-							if (vm.path.equals(jpm.getJvmLocation())) {
-								cmd.jvmLocation = vm.path;
+						if (jpm.getJvmLocation() != null) {
+							for (JVM vm : vms) {
+								if (jpm.getJvmLocation().startsWith(vm.path)) {
+									cmd.jvmLocation = vm.path;
 
-								break;
+									break;
+								}
 							}
 						}
 
