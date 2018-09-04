@@ -518,6 +518,11 @@ public class Main extends ReporterAdapter {
 						if (cmd.jvmLocation == null) {
 							cmd.jvmLocation = vms.first().path;
 						}
+						else if (cmd.jvmLocation.endsWith("java.exe")) {
+							File javaFile = new File(cmd.jvmLocation);
+
+							cmd.jvmLocation = javaFile.getParentFile().getParent();
+						}
 					}
 
 					logger.debug("main={}, name={}", cmd.main, cmd.name);
