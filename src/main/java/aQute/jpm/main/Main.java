@@ -503,25 +503,20 @@ public class Main extends ReporterAdapter {
 					SortedSet<JVM> vms = jpm.getVMs();
 
 					if (vms != null && vms.size() > 0) {
-						String jvmLocation = jpm.getJvmLocation();
+						String jpmJvmLocation = jpm.getJvmLocation();
+						String cmdJvmLocation = cmd.jvmLocation;
 
-						if (jvmLocation != null) {
-							for (JVM vm : vms) {
-								if (jvmLocation.startsWith(vm.path)) {
-									cmd.jvmLocation = vm.path;
-
-									break;
-								}
+						for (JVM vm : vms) {
+							if (jpmJvmLocation != null && jpmJvmLocation.startsWith(vm.path)) {
+								cmd.jvmLocation = vm.path;
+							}
+							else if (cmdJvmLocation != null && cmdJvmLocation.startsWith(vm.path)) {
+								cmd.jvmLocation = vm.path;
 							}
 						}
 
 						if (cmd.jvmLocation == null) {
-							cmd.jvmLocation = vms.first().path;
-						}
-						else if (cmd.jvmLocation.endsWith("java.exe")) {
-							File javaFile = new File(cmd.jvmLocation);
-
-							cmd.jvmLocation = javaFile.getParentFile().getParent();
+							cmd.jvmLocation = vms.last().path;
 						}
 					}
 
