@@ -45,6 +45,8 @@ import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -503,15 +505,25 @@ public class Main extends ReporterAdapter {
 					SortedSet<JVM> vms = jpm.getVMs();
 
 					if (vms != null && vms.size() > 0) {
-						String jpmJvmLocation = jpm.getJvmLocation();
 						String cmdJvmLocation = cmd.jvmLocation;
+						String jpmJvmLocation = jpm.getJvmLocation();
 
 						for (JVM vm : vms) {
-							if (jpmJvmLocation != null && jpmJvmLocation.startsWith(vm.path)) {
-								cmd.jvmLocation = vm.path;
+							Path vmPath = Paths.get(vm.path);
+
+							if (jpmJvmLocation != null) {
+								Path jpmJvmPath = Paths.get(jpmJvmLocation);
+
+								if (jpmJvmPath.startsWith(vmPath)) {
+									cmd.jvmLocation = vm.path;
+								}
 							}
-							else if (cmdJvmLocation != null && cmdJvmLocation.startsWith(vm.path)) {
-								cmd.jvmLocation = vm.path;
+							else if (cmdJvmLocation != null) {
+								Path cmdJvmPath = Paths.get(cmdJvmLocation);
+
+								if (cmdJvmPath.startsWith(vmPath)) {
+									cmd.jvmLocation = vm.path;
+								}
 							}
 						}
 
