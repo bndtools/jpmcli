@@ -134,45 +134,43 @@ class Linux extends Unix {
 	private String getVersion(File vmdir) {
 		File javaExe = new File(vmdir, "bin/java");
 
-		if (javaExe.exists()) {
-			try {
+		String output = null;
+
+		try {
+
+			if (javaExe.exists()) {
+						
 				ProcessBuilder builder = new ProcessBuilder(javaExe.getAbsolutePath(), "-version");
 				
-				try (BufferedReader reader = IO.reader(builder.start().getErrorStream());
-					Scanner scanner = new Scanner(reader)) {
-
+				try (BufferedReader reader = IO.reader(builder.start().getErrorStream())) {
+					output = reader.lines().collect(Collectors.joining());
+				}
+				try (Scanner scanner = new Scanner(output)) {
+		
 					Pattern pattern = Pattern.compile(".*([0-9]+\\.[0-9]+\\.[0-9_]+).*");
 					
 					while (scanner.hasNextLine()) {
 						String line = scanner.nextLine();
-
+		
 						Matcher matcher = pattern.matcher(line);
-
+		
 						if (matcher.matches()) {
 							return matcher.group(1);
 						}
 					}
-					
-					String output = reader.lines().collect(Collectors.joining());
-
-					StringBuilder sb = new StringBuilder();
-					sb.append("Unable to find java version in directory:");
-					sb.append(System.lineSeparator());
-					sb.append(vmdir.getAbsolutePath());
-					sb.append(System.lineSeparator());
-					sb.append("Output: ");
-					sb.append(System.lineSeparator());
-					sb.append(output);
-					throw new NoSuchElementException(sb.toString());
 				}
-			} catch (IOException e) {
 			}
+		} catch (IOException e) {
 		}
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append("Unable to find java version in directory:");
 		sb.append(System.lineSeparator());
 		sb.append(vmdir.getAbsolutePath());
+		sb.append(System.lineSeparator());
+		sb.append("Output: ");
+		sb.append(System.lineSeparator());
+		sb.append(output);
 		throw new NoSuchElementException(sb.toString());
 	}
 
