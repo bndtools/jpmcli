@@ -1,14 +1,18 @@
 package aQute.jpm.platform;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -133,18 +137,43 @@ class Linux extends Unix {
 		if (javaExe.exists()) {
 			try {
 				ProcessBuilder builder = new ProcessBuilder(javaExe.getAbsolutePath(), "-version");
-				String output = IO.reader(builder.start().getErrorStream()).readLine();
+				
+				try (BufferedReader reader = IO.reader(builder.start().getErrorStream());
+					Scanner scanner = new Scanner(reader)) {
 
-				Matcher matcher = Pattern.compile(".*([0-9]+\\.[0-9]+\\.[0-9_]+).*").matcher(output);
+					Pattern pattern = Pattern.compile(".*([0-9]+\\.[0-9]+\\.[0-9_]+).*");
+					
+					while (scanner.hasNextLine()) {
+						String line = scanner.nextLine();
 
-				if (matcher.matches()) {
-					return matcher.group(1);
+						Matcher matcher = pattern.matcher(line);
+
+						if (matcher.matches()) {
+							return matcher.group(1);
+						}
+					}
+					
+					String output = reader.lines().collect(Collectors.joining());
+
+					StringBuilder sb = new StringBuilder();
+					sb.append("Unable to find java version in directory:");
+					sb.append(System.lineSeparator());
+					sb.append(vmdir.getAbsolutePath());
+					sb.append(System.lineSeparator());
+					sb.append("Output: ");
+					sb.append(System.lineSeparator());
+					sb.append(output);
+					throw new NoSuchElementException(sb.toString());
 				}
 			} catch (IOException e) {
 			}
 		}
-
-		return null;
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append("Unable to find java version in directory:");
+		sb.append(System.lineSeparator());
+		sb.append(vmdir.getAbsolutePath());
+		throw new NoSuchElementException(sb.toString());
 	}
 
 }
