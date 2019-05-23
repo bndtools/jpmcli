@@ -143,7 +143,7 @@ class Linux extends Unix {
 				ProcessBuilder builder = new ProcessBuilder(javaExe.getAbsolutePath(), "-version");
 				
 				try (BufferedReader reader = IO.reader(builder.start().getErrorStream())) {
-					output = reader.lines().collect(Collectors.joining());
+					output = reader.lines().map(x -> x + System.lineSeparator()).collect(Collectors.joining());
 				}
 				try (Scanner scanner = new Scanner(output)) {
 		
