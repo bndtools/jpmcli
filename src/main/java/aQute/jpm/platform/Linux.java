@@ -1,14 +1,18 @@
 package aQute.jpm.platform;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -130,21 +134,44 @@ class Linux extends Unix {
 	private String getVersion(File vmdir) {
 		File javaExe = new File(vmdir, "bin/java");
 
-		if (javaExe.exists()) {
-			try {
+		String javaVersionOutput = null;
+
+		try {
+			if (javaExe.exists()) {
+
 				ProcessBuilder builder = new ProcessBuilder(javaExe.getAbsolutePath(), "-version");
-				String output = IO.reader(builder.start().getErrorStream()).readLine();
 
-				Matcher matcher = Pattern.compile(".*([0-9]+\\.[0-9]+\\.[0-9_]+).*").matcher(output);
-
-				if (matcher.matches()) {
-					return matcher.group(1);
+				try (BufferedReader reader = IO.reader(builder.start().getErrorStream())) {
+					javaVersionOutput = reader.lines().collect(Collectors.joining(System.lineSeparator()));
 				}
-			} catch (IOException e) {
+
+				try (Scanner scanner = new Scanner(javaVersionOutput)) {
+
+					Pattern pattern = Pattern.compile(".*([0-9]+\\.[0-9]+\\.[0-9_]+).*");
+
+					while (scanner.hasNextLine()) {
+						String line = scanner.nextLine();
+
+						Matcher matcher = pattern.matcher(line);
+
+						if (matcher.matches()) {
+							return matcher.group(1);
+						}
+					}
+				}
 			}
+		} catch (IOException e) {
 		}
 
-		return null;
+		StringBuilder sb = new StringBuilder();
+		sb.append("Unable to find java version for directory: ");
+		sb.append(vmdir.getAbsolutePath());
+		sb.append(System.lineSeparator());
+		sb.append("\"java -version\" output: ");
+		sb.append(System.lineSeparator());
+		sb.append(javaVersionOutput);
+
+		throw new NoSuchElementException(sb.toString());
 	}
 
 }
