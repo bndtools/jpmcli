@@ -68,6 +68,8 @@ public class WinRegistry
 
     private static Method regDeleteValue = null;
 
+    private static boolean onJava11 = false;
+
     private static Pattern REGISTRY_REFERENCE_REGEX = Pattern.compile( "\\$\\(Registry:([A-Z_]+)\\\\(.*)@(.*)\\)" );
 
     static
@@ -114,7 +116,58 @@ public class WinRegistry
             regDeleteKey.setAccessible( true );
         }
         catch (NoSuchMethodException e){
-           // we are not on windows, then!
+           // On Java 11, the parameter list has been changed!
+
+            try
+            {
+                regOpenKey = userClass.getDeclaredMethod(
+                    "WindowsRegOpenKey", new Class[]{ long.class, byte[].class, int.class }
+                );
+                regOpenKey.setAccessible( true );
+                regCloseKey = userClass.getDeclaredMethod( "WindowsRegCloseKey", new Class[]{ long.class } );
+                regCloseKey.setAccessible( true );
+                regQueryValueEx = userClass.getDeclaredMethod(
+                    "WindowsRegQueryValueEx", new Class[]{ long.class, byte[].class }
+                );
+                regQueryValueEx.setAccessible( true );
+                regEnumValue = userClass.getDeclaredMethod(
+                    "WindowsRegEnumValue", new Class[]{ long.class, int.class, int.class }
+                );
+                regEnumValue.setAccessible( true );
+                regQueryInfoKey = userClass.getDeclaredMethod( "WindowsRegQueryInfoKey1", new Class[]{ long.class } );
+                regQueryInfoKey.setAccessible( true );
+                regEnumKeyEx = userClass.getDeclaredMethod(
+                    "WindowsRegEnumKeyEx", new Class[]{ long.class, int.class, int.class }
+                );
+                regEnumKeyEx.setAccessible( true );
+                regCreateKeyEx = userClass.getDeclaredMethod(
+                    "WindowsRegCreateKeyEx", new Class[]{ long.class, byte[].class }
+                );
+                regCreateKeyEx.setAccessible( true );
+                regSetValueEx = userClass.getDeclaredMethod(
+                    "WindowsRegSetValueEx", new Class[]{ long.class, byte[].class, byte[].class }
+                );
+                regSetValueEx.setAccessible( true );
+                regDeleteValue = userClass.getDeclaredMethod(
+                    "WindowsRegDeleteValue", new Class[]{ long.class, byte[].class }
+                );
+                regDeleteValue.setAccessible( true );
+                regDeleteKey = userClass.getDeclaredMethod(
+                    "WindowsRegDeleteKey", new Class[]{
+                            long.class, byte[].class
+                    }
+                );
+                regDeleteKey.setAccessible( true );
+
+                onJava11 = true;
+            }
+            catch (NoSuchMethodException e1){
+                // we are not on windows, then!
+            }
+            catch ( Exception e1 )
+            {
+                e.printStackTrace();
+            }
         }
         catch ( Exception e )
         {
@@ -143,17 +196,35 @@ public class WinRegistry
         IllegalAccessException,
         InvocationTargetException
     {
-        if ( hkey == HKEY_LOCAL_MACHINE )
+        if (onJava11)
         {
-            return readString( systemRoot, hkey, key, valueName );
-        }
-        else if ( hkey == HKEY_CURRENT_USER )
-        {
-            return readString( userRoot, hkey, key, valueName );
+            if ( hkey == HKEY_LOCAL_MACHINE )
+            {
+                return readString( systemRoot, (long)hkey, key, valueName );
+            }
+            else if ( hkey == HKEY_CURRENT_USER )
+            {
+                return readString( userRoot, (long)hkey, key, valueName );
+            }
+            else
+            {
+                throw new IllegalArgumentException( "hkey=" + hkey );
+            }
         }
         else
         {
-            throw new IllegalArgumentException( "hkey=" + hkey );
+            if ( hkey == HKEY_LOCAL_MACHINE )
+            {
+                return readString( systemRoot, hkey, key, valueName );
+            }
+            else if ( hkey == HKEY_CURRENT_USER )
+            {
+                return readString( userRoot, hkey, key, valueName );
+            }
+            else
+            {
+                throw new IllegalArgumentException( "hkey=" + hkey );
+            }
         }
     }
 
@@ -173,17 +244,35 @@ public class WinRegistry
         IllegalAccessException,
         InvocationTargetException
     {
-        if ( hkey == HKEY_LOCAL_MACHINE )
+        if (onJava11)
         {
-            return readStringValues( systemRoot, hkey, key );
-        }
-        else if ( hkey == HKEY_CURRENT_USER )
-        {
-            return readStringValues( userRoot, hkey, key );
+            if ( hkey == HKEY_LOCAL_MACHINE )
+            {
+                return readStringValues( systemRoot, (long)hkey, key );
+            }
+            else if ( hkey == HKEY_CURRENT_USER )
+            {
+                return readStringValues( userRoot, (long)hkey, key );
+            }
+            else
+            {
+                throw new IllegalArgumentException( "hkey=" + hkey );
+            }
         }
         else
         {
-            throw new IllegalArgumentException( "hkey=" + hkey );
+            if ( hkey == HKEY_LOCAL_MACHINE )
+            {
+                return readStringValues( systemRoot, hkey, key );
+            }
+            else if ( hkey == HKEY_CURRENT_USER )
+            {
+                return readStringValues( userRoot, hkey, key );
+            }
+            else
+            {
+                throw new IllegalArgumentException( "hkey=" + hkey );
+            }
         }
     }
 
@@ -203,17 +292,35 @@ public class WinRegistry
         IllegalAccessException,
         InvocationTargetException
     {
-        if ( hkey == HKEY_LOCAL_MACHINE )
+        if (onJava11)
         {
-            return readStringSubKeys( systemRoot, hkey, key );
-        }
-        else if ( hkey == HKEY_CURRENT_USER )
-        {
-            return readStringSubKeys( userRoot, hkey, key );
+            if ( hkey == HKEY_LOCAL_MACHINE )
+            {
+                return readStringSubKeys( systemRoot, (long)hkey, key );
+            }
+            else if ( hkey == HKEY_CURRENT_USER )
+            {
+                return readStringSubKeys( userRoot, (long)hkey, key );
+            }
+            else
+            {
+                throw new IllegalArgumentException( "hkey=" + hkey );
+            }
         }
         else
         {
-            throw new IllegalArgumentException( "hkey=" + hkey );
+            if ( hkey == HKEY_LOCAL_MACHINE )
+            {
+                return readStringSubKeys( systemRoot, hkey, key );
+            }
+            else if ( hkey == HKEY_CURRENT_USER )
+            {
+                return readStringSubKeys( userRoot, hkey, key );
+            }
+            else
+            {
+                throw new IllegalArgumentException( "hkey=" + hkey );
+            }
         }
     }
 
@@ -232,24 +339,49 @@ public class WinRegistry
         IllegalAccessException,
         InvocationTargetException
     {
-        int[] ret;
-        if ( hkey == HKEY_LOCAL_MACHINE )
+        if (onJava11)
         {
-            ret = createKey( systemRoot, hkey, key );
-            regCloseKey.invoke( systemRoot, new Object[]{ new Integer( ret[0] ) } );
-        }
-        else if ( hkey == HKEY_CURRENT_USER )
-        {
-            ret = createKey( userRoot, hkey, key );
-            regCloseKey.invoke( userRoot, new Object[]{ new Integer( ret[0] ) } );
+            long[] ret;
+            if ( hkey == HKEY_LOCAL_MACHINE )
+            {
+                ret = createKey( systemRoot, (long)hkey, key );
+                regCloseKey.invoke( systemRoot, new Object[]{ new Long( ret[0] ) } );
+            }
+            else if ( hkey == HKEY_CURRENT_USER )
+            {
+                ret = createKey( userRoot, (long)hkey, key );
+                regCloseKey.invoke( userRoot, new Object[]{ new Long( ret[0] ) } );
+            }
+            else
+            {
+                throw new IllegalArgumentException( "hkey=" + hkey );
+            }
+            if ( ret[1] != REG_SUCCESS )
+            {
+                throw new IllegalArgumentException( "rc=" + ret[1] + "  key=" + key );
+            }
         }
         else
         {
-            throw new IllegalArgumentException( "hkey=" + hkey );
-        }
-        if ( ret[1] != REG_SUCCESS )
-        {
-            throw new IllegalArgumentException( "rc=" + ret[1] + "  key=" + key );
+            int[] ret;
+            if ( hkey == HKEY_LOCAL_MACHINE )
+            {
+                ret = createKey( systemRoot, hkey, key );
+                regCloseKey.invoke( systemRoot, new Object[]{ new Integer( ret[0] ) } );
+            }
+            else if ( hkey == HKEY_CURRENT_USER )
+            {
+                ret = createKey( userRoot, hkey, key );
+                regCloseKey.invoke( userRoot, new Object[]{ new Integer( ret[0] ) } );
+            }
+            else
+            {
+                throw new IllegalArgumentException( "hkey=" + hkey );
+            }
+            if ( ret[1] != REG_SUCCESS )
+            {
+                throw new IllegalArgumentException( "rc=" + ret[1] + "  key=" + key );
+            }
         }
     }
 
@@ -270,18 +402,37 @@ public class WinRegistry
         IllegalAccessException,
         InvocationTargetException
     {
-        if ( hkey == HKEY_LOCAL_MACHINE )
+        if (onJava11)
         {
-            writeStringValue( systemRoot, hkey, key, valueName, value );
-        }
-        else if ( hkey == HKEY_CURRENT_USER )
-        {
-            writeStringValue( userRoot, hkey, key, valueName, value );
+            if ( hkey == HKEY_LOCAL_MACHINE )
+            {
+                writeStringValue( systemRoot, (long)hkey, key, valueName, value );
+            }
+            else if ( hkey == HKEY_CURRENT_USER )
+            {
+                writeStringValue( userRoot, (long)hkey, key, valueName, value );
+            }
+            else
+            {
+                throw new IllegalArgumentException( "hkey=" + hkey );
+            }
         }
         else
         {
-            throw new IllegalArgumentException( "hkey=" + hkey );
+            if ( hkey == HKEY_LOCAL_MACHINE )
+            {
+                writeStringValue( systemRoot, hkey, key, valueName, value );
+            }
+            else if ( hkey == HKEY_CURRENT_USER )
+            {
+                writeStringValue( userRoot, hkey, key, valueName, value );
+            }
+            else
+            {
+                throw new IllegalArgumentException( "hkey=" + hkey );
+            }
         }
+
     }
 
     /**
@@ -300,17 +451,36 @@ public class WinRegistry
         InvocationTargetException
     {
         int rc = -1;
-        if ( hkey == HKEY_LOCAL_MACHINE )
+
+        if (onJava11)
         {
-            rc = deleteKey( systemRoot, hkey, key );
+            if ( hkey == HKEY_LOCAL_MACHINE )
+            {
+                rc = deleteKey( systemRoot, (long)hkey, key );
+            }
+            else if ( hkey == HKEY_CURRENT_USER )
+            {
+                rc = deleteKey( userRoot, (long)hkey, key );
+            }
+            if ( rc != REG_SUCCESS )
+            {
+                throw new IllegalArgumentException( "rc=" + rc + "  key=" + key );
+            }
         }
-        else if ( hkey == HKEY_CURRENT_USER )
+        else
         {
-            rc = deleteKey( userRoot, hkey, key );
-        }
-        if ( rc != REG_SUCCESS )
-        {
-            throw new IllegalArgumentException( "rc=" + rc + "  key=" + key );
+            if ( hkey == HKEY_LOCAL_MACHINE )
+            {
+                rc = deleteKey( systemRoot, hkey, key );
+            }
+            else if ( hkey == HKEY_CURRENT_USER )
+            {
+                rc = deleteKey( userRoot, hkey, key );
+            }
+            if ( rc != REG_SUCCESS )
+            {
+                throw new IllegalArgumentException( "rc=" + rc + "  key=" + key );
+            }
         }
     }
 
@@ -330,18 +500,40 @@ public class WinRegistry
         IllegalAccessException,
         InvocationTargetException
     {
-        int rc = -1;
-        if ( hkey == HKEY_LOCAL_MACHINE )
+
+        if (onJava11)
         {
-            rc = deleteValue( systemRoot, hkey, key, value );
+            long rc = -1;
+
+            if ( hkey == HKEY_LOCAL_MACHINE )
+            {
+                rc = deleteValue( systemRoot, (long)hkey, key, value );
+            }
+            else if ( hkey == HKEY_CURRENT_USER )
+            {
+                rc = deleteValue( userRoot, (long)hkey, key, value );
+            }
+            if ( rc != REG_SUCCESS )
+            {
+                throw new IllegalArgumentException( "rc=" + rc + "  key=" + key + "  value=" + value );
+            }
         }
-        else if ( hkey == HKEY_CURRENT_USER )
+        else
         {
-            rc = deleteValue( userRoot, hkey, key, value );
-        }
-        if ( rc != REG_SUCCESS )
-        {
-            throw new IllegalArgumentException( "rc=" + rc + "  key=" + key + "  value=" + value );
+            int rc = -1;
+
+            if ( hkey == HKEY_LOCAL_MACHINE )
+            {
+                rc = deleteValue( systemRoot, hkey, key, value );
+            }
+            else if ( hkey == HKEY_CURRENT_USER )
+            {
+                rc = deleteValue( userRoot, hkey, key, value );
+            }
+            if ( rc != REG_SUCCESS )
+            {
+                throw new IllegalArgumentException( "rc=" + rc + "  key=" + key + "  value=" + value );
+            }
         }
     }
 
@@ -372,6 +564,31 @@ public class WinRegistry
         return rc;
     }
 
+    private static long deleteValue( Preferences root, long hkey, String key, String value ) throws
+        IllegalArgumentException,
+        IllegalAccessException,
+        InvocationTargetException
+    {
+        long[] handles = (long[]) regOpenKey.invoke(
+            root, new Object[]{
+            new Long( hkey ), toCstr( key ), new Integer( KEY_ALL_ACCESS )
+        }
+        );
+        if ( handles[1] != REG_SUCCESS )
+        {
+            return handles[1];  // can be REG_NOTFOUND, REG_ACCESSDENIED
+        }
+        long rc = (
+            (Long) regDeleteValue.invoke(
+                root, new Object[]{
+                new Long( handles[0] ), toCstr( value )
+            }
+            )
+        ).longValue();
+        regCloseKey.invoke( root, new Object[]{ new Long( handles[0] ) } );
+        return rc;
+    }
+
     private static int deleteKey( Preferences root, int hkey, String key ) throws
         IllegalArgumentException,
         IllegalAccessException,
@@ -380,6 +597,19 @@ public class WinRegistry
         int rc = (
             (Integer) regDeleteKey.invoke(
                 root, new Object[]{ new Integer( hkey ), toCstr( key ) }
+            )
+        ).intValue();
+        return rc;  // can REG_NOTFOUND, REG_ACCESSDENIED, REG_SUCCESS
+    }
+
+    private static int deleteKey( Preferences root, long hkey, String key ) throws
+        IllegalArgumentException,
+        IllegalAccessException,
+        InvocationTargetException
+    {
+        int rc = (
+            (Integer) regDeleteKey.invoke(
+                root, new Object[]{ new Long( hkey ), toCstr( key ) }
             )
         ).intValue();
         return rc;  // can REG_NOTFOUND, REG_ACCESSDENIED, REG_SUCCESS
@@ -403,6 +633,27 @@ public class WinRegistry
             root, new Object[]{ new Integer( handles[0] ), toCstr( value ) }
         );
         regCloseKey.invoke( root, new Object[]{ new Integer( handles[0] ) } );
+        return ( valb != null ? new String( valb ).trim() : null );
+    }
+
+    private static String readString( Preferences root, long hkey, String key, String value ) throws
+        IllegalArgumentException,
+        IllegalAccessException,
+        InvocationTargetException
+    {
+        long[] handles = (long[]) regOpenKey.invoke(
+            root, new Object[]{
+            new Long( hkey ), toCstr( key ), new Integer( KEY_READ )
+        }
+        );
+        if ( handles[1] != REG_SUCCESS )
+        {
+            return null;
+        }
+        byte[] valb = (byte[]) regQueryValueEx.invoke(
+            root, new Object[]{ new Long( handles[0] ), toCstr( value ) }
+        );
+        regCloseKey.invoke( root, new Object[]{ new Long( handles[0] ) } );
         return ( valb != null ? new String( valb ).trim() : null );
     }
 
@@ -439,6 +690,39 @@ public class WinRegistry
         return results;
     }
 
+    private static Map<String, String> readStringValues( Preferences root, long hkey, String key ) throws
+        IllegalArgumentException,
+        IllegalAccessException,
+        InvocationTargetException
+    {
+        HashMap<String, String> results = new HashMap<String, String>();
+        long[] handles = (long[]) regOpenKey.invoke(
+            root, new Object[]{
+            new Long( hkey ), toCstr( key ), new Integer( KEY_READ )
+        }
+        );
+        if ( handles[1] != REG_SUCCESS )
+        {
+            return null;
+        }
+        long[] info = (long[]) regQueryInfoKey.invoke( root, new Object[]{ new Long( handles[0] ) } );
+
+        long count = info[2]; // count
+        long maxlen = info[3]; // value length max
+        for ( long index = 0; index < count; index++ )
+        {
+            byte[] name = (byte[]) regEnumValue.invoke(
+                root, new Object[]{
+                new Long( handles[0] ), new Long( index ), new Long( maxlen + 1 )
+            }
+            );
+            String value = readString( (int)hkey, key, new String( name ) );
+            results.put( new String( name ).trim(), value );
+        }
+        regCloseKey.invoke( root, new Object[]{ new Long( handles[0] ) } );
+        return results;
+    }
+
     private static List<String> readStringSubKeys( Preferences root, int hkey, String key ) throws
         IllegalArgumentException,
         IllegalAccessException,
@@ -471,12 +755,52 @@ public class WinRegistry
         return results;
     }
 
+    private static List<String> readStringSubKeys( Preferences root, long hkey, String key ) throws
+            IllegalArgumentException,
+            IllegalAccessException,
+            InvocationTargetException
+    {
+        List<String> results = new ArrayList<String>();
+        long[] handles = (long[]) regOpenKey.invoke(
+            root, new Object[]{
+            new Long( hkey ), toCstr( key ), new Integer( KEY_READ )
+        }
+        );
+        if ( handles[1] != REG_SUCCESS )
+        {
+            return null;
+        }
+        long[] info = (long[]) regQueryInfoKey.invoke( root, new Object[]{ new Long( handles[0] ) } );
+
+        long count = info[0]; // count
+        int maxlen = (int)info[3]; // value length max
+        for ( int index = 0; index < count; index++ )
+        {
+            byte[] name = (byte[]) regEnumKeyEx.invoke(
+                root, new Object[]{
+                new Long( handles[0] ), new Integer( index ), new Integer( maxlen + 1 )
+            }
+            );
+            results.add( new String( name ).trim() );
+        }
+        regCloseKey.invoke( root, new Object[]{ new Long( handles[0] ) } );
+        return results;
+    }
+
     private static int[] createKey( Preferences root, int hkey, String key ) throws
         IllegalArgumentException,
         IllegalAccessException,
         InvocationTargetException
     {
         return (int[]) regCreateKeyEx.invoke( root, new Object[]{ new Integer( hkey ), toCstr( key ) } );
+    }
+
+    private static long[] createKey( Preferences root, long hkey, String key ) throws
+        IllegalArgumentException,
+        IllegalAccessException,
+        InvocationTargetException
+    {
+        return (long[]) regCreateKeyEx.invoke( root, new Object[]{ new Long( hkey ), toCstr( key ) } );
     }
 
     private static void writeStringValue(
@@ -495,6 +819,21 @@ public class WinRegistry
         regCloseKey.invoke( root, new Object[]{ new Integer( handles[0] ) } );
     }
 
+    private static void writeStringValue(
+        Preferences root, long hkey, String key, String valueName, String value ) throws
+        IllegalArgumentException,
+        IllegalAccessException,
+        InvocationTargetException
+    {
+        long[] handles = (long[]) regOpenKey.invoke(
+            root, new Object[]{
+            new Long( hkey ), toCstr( key ), new Integer( KEY_ALL_ACCESS )
+        }
+        );
+
+        regSetValueEx.invoke( root, new Object[]{ new Long( handles[0] ), toCstr( valueName ), toCstr( value ) } );
+        regCloseKey.invoke( root, new Object[]{ new Long( handles[0] ) } );
+    }
     // utility
     private static byte[] toCstr( String str )
     {
