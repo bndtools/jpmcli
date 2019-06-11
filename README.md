@@ -1,8 +1,22 @@
 # Just Another Package Manager for Java
 The purpose of the this command is to maintain a set of commands and services available via the command
-line. It has the same purpose as [npm][1] but then for Java.
+line. It has the same purpose as [npm][1] but then for Java. The command can install java command line
+commands directly from a URL or file path. The only requirement is that the JAR file is an _executable jar_
+with a Main-Class header.
 
-You should first install jpm, this is described for the different supported platforms on the [jpm website][2].
+Originally jpm was backed by a server that indexed a lot of repositories. However, this server was shutdown because
+nobody was really interested in it at the time. However, since you can also install executable JARs from the
+commandline it is still very useful. Unfortunately the command has not been refactored to use Maven Central or
+other Maven repos as backend.
+
+## Install
+
+You should first install _jpm_. To install download the JAR and run the `init` command. For example:
+
+    $ curl https://repo1.maven.org/maven2/biz/aQute/bnd/biz.aQute.jpm.run/3.5.0/biz.aQute.jpm.run-3.5.0.jar >t.jar
+    $ java -jar t.jar init
+    Home dir      /Users/aqute/Library/PackageManager
+    Bin  dir      /Users/aqute/Library/PackageManager/bin
 
 After you've installed it, you should be able to do:
 
@@ -20,16 +34,19 @@ To find your way around jpm, you can use help.
 
     Available commands:
 
-      candidates                  - List the candidates for a coordinate
       ...
 
 For each command, more extensive help is available with `help <command>`.
 
-    $ jpm help candidates
+    $ jpm help version
+
     NAME
-      candidates                  - Print out the candidates from a coordinate
-                                    specification. A coordinate is:
-      ....
+      version                     - Show the current version. The qualifier
+                                    represents the build date.
+
+    SYNOPSIS
+       version 
+
 
 ## Installing
 The first thing you are likely want to do is installing a command. bnd, the Swiss army knife for OSGi
@@ -78,17 +95,6 @@ There are a number of recurring types used in the command line.
 
 * url - A well known url, like 'http://bndtools.org'
 * file - A path on the file system in the local standard. That is on Windows use the back slash, on other operating systems use the forward slash.
-* coordinates - Coordinates describe a _revision_ or a _program_. A revision is an actual JAR, the program is the project that creates the revisions. A program coordinate consists of a group id and an artifact id, after maven.
-
-  Some groups are special:
-  * `OSGI` : The OSGI group makes the artifact Id a bundle symbolic name. A maven user should never use this group.
-  * `SHA` : The SHA group turns the artifact Id into a SHA. By definition, a SHA artifact has a version of 0.0.0. A SHA group Id can (obviously) only be used for revisions.
-
-  A program is identified by a group and artifact id. Revisions can also be identified by a _classifier_ and a _version_. A classifier is also a maven concept; versions can occur in maven or in OSGi. A coordinate is a single string without whitespace identifying a program or revision. It must have the following syntax:
-  In the case of `maven`, the order is `groupId`, `artifactId`, `classifier`, and then version.
-
-<pre>coordinates ::= NAME | maven
-maven         ::= NAME ':' NAME ( ':' NAME ) ( '@' VERSION )</pre>
 
 ## Commands
 
@@ -98,4 +104,3 @@ Display the version of the jpm command. This is the current version number and t
 ###
 
 [1]: https://npmjs.org
-[2]: http://jpm.bndtools.org
