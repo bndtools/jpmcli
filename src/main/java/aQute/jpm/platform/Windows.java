@@ -48,6 +48,7 @@ import aQute.lib.strings.Strings;
 public class Windows extends Platform {
 	private static final String JRE_KEY_PREFIX = "Software\\JavaSoft\\Java Runtime Environment";
 	private static final String JDK_KEY_PREFIX = "Software\\JavaSoft\\Java Development Kit";
+	private static final String JDK_11_KEY_PREFIX = "Software\\JavaSoft\\JDK";
 	private final static Logger	logger	= LoggerFactory.getLogger(Windows.class);
 	static boolean	IS64	= System.getProperty("os.arch").contains("64");
 
@@ -374,6 +375,7 @@ public class Windows extends Platform {
 	public void getVMs(Collection<JVM> vms) throws Exception {
 		findJavaHomes(vms, JRE_KEY_PREFIX);
 		findJavaHomes(vms, JDK_KEY_PREFIX);
+		findJavaHomes(vms, JDK_11_KEY_PREFIX);
 	}
 
 	private void findJavaHomes(Collection<JVM> vms, String prefix) throws Exception {
