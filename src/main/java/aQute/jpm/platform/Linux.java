@@ -147,15 +147,15 @@ class Linux extends Unix {
 
 				try (Scanner scanner = new Scanner(javaVersionOutput)) {
 
-					Pattern pattern = Pattern.compile(".*([0-9]+\\.[0-9]+\\.[0-9_]+).*");
+					Pattern pattern = Pattern.compile("[1-9][0-9]*((.0)*.[1-9][0-9]*)*");
 
 					while (scanner.hasNextLine()) {
 						String line = scanner.nextLine();
 
 						Matcher matcher = pattern.matcher(line);
 
-						if (matcher.matches()) {
-							return matcher.group(1);
+						if (matcher.find()) {
+							return matcher.group();
 						}
 					}
 				}
