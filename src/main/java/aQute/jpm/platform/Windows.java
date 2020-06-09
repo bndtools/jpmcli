@@ -181,6 +181,11 @@ public class Windows extends Platform {
 	}
 
 	@Override
+	public String getConfigFile() throws Exception {
+		return System.getProperty("user.home") + "/.jpm/settings.json";
+	}
+
+	@Override
 	public void deleteCommand(CommandData cmd) throws Exception {
 		String executable = getExecutable(cmd);
 		File f = new File(executable);
