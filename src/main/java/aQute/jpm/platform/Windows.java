@@ -72,7 +72,7 @@ public class Windows extends Platform {
 	 */
 	@Override
 	public File getLocal() {
-		return IO.getFile("~/.jpm/windows");
+		return IO.getFile(System.getProperty("user.home") + "/.jpm/windows");
 	}
 
 	/**
