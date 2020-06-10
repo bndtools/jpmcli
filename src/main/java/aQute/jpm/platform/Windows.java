@@ -72,7 +72,7 @@ public class Windows extends Platform {
 	 */
 	@Override
 	public File getLocal() {
-		return IO.getFile("~/.jpm/windows");
+		return IO.getFile(System.getProperty("user.home") + "/.jpm/windows");
 	}
 
 	/**
@@ -178,6 +178,11 @@ public class Windows extends Platform {
 		}
 		logger.debug("Ini content {}", IO.collect(ini, defaultCharset));
 		return null;
+	}
+
+	@Override
+	public String getConfigFile() throws Exception {
+		return System.getProperty("user.home") + "/.jpm/settings.json";
 	}
 
 	@Override
