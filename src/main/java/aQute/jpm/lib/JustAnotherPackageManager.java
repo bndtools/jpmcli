@@ -1285,6 +1285,31 @@ public class JustAnotherPackageManager {
 				if (attrs.containsKey("jvmargs"))
 					data.jvmArgs = attrs.get("jvmargs");
 
+				CommandData preData = getCommand(command.toString());
+				if (preData != null && preData.jvmArgs != null) {
+					String preJvmArgs = preData.jvmArgs;
+					String newJvmArgs = data.jvmArgs;
+					if (preJvmArgs.length() > 0) {
+						if (newJvmArgs == null)
+							data.jvmArgs = preJvmArgs;
+						else {
+							String parts[] = preJvmArgs.split("\\s+");
+							String newParts[] = newJvmArgs.split("\\s+");
+
+							for (String part : parts) {
+								boolean exist = false;
+								for (String newPart : newParts) {
+									String argName = part.substring(0, part.indexOf("="));
+									if (argName.equals(newPart.substring(0, newPart.indexOf("="))))
+										exist = true;
+								}
+								if (!exist)
+									data.jvmArgs = data.jvmArgs + " " + part;
+							}
+						}
+					}
+				}
+
 				if (attrs.containsKey("title"))
 					data.title = attrs.get("title");
 

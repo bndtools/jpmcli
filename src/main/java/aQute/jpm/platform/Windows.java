@@ -189,7 +189,7 @@ public class Windows extends Platform {
 	public void deleteCommand(CommandData cmd) throws Exception {
 		String executable = getExecutable(cmd);
 		File f = new File(executable);
-		File fj = new File(executable + ".ini");
+		File fj = new File(f.getAbsolutePath().replaceAll("\\.exe$", ".ini"));
 		if (cmd.name.equals("jpm")) {
 			logger.debug("leaving jpm behind");
 			return;
