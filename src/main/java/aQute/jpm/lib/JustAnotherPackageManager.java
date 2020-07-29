@@ -1286,7 +1286,7 @@ public class JustAnotherPackageManager {
 					data.jvmArgs = attrs.get("jvmargs");
 
 				CommandData preData = getCommand(command.toString());
-				if (preData != null) {
+				if (preData != null && preData.jvmArgs != null) {
 					String preJvmArgs = preData.jvmArgs;
 					String newJvmArgs = data.jvmArgs;
 					if (preJvmArgs.length() > 0) {
