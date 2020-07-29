@@ -1,9 +1,13 @@
 package aQute.jpm.platform;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -129,15 +133,17 @@ class MacOS extends Unix {
 	@Override
 	public void getVMs(Collection<JVM> vms) throws Exception {
 		String paths[] = {
-				"/System/Library/Java/JavaVirtualMachines", "/Library/Java/JavaVirtualMachines"
+				"/System/Library/Java/JavaVirtualMachines", "/Library/Java/JavaVirtualMachines", System.getenv("JAVA_HOME")
 		};
 		for (String path : paths) {
-			File[] vmFiles = new File(path).listFiles();
-			if (vmFiles != null) {
-				for (File vmdir : vmFiles) {
-					JVM jvm = getJVM(vmdir);
-					if (jvm != null)
-						vms.add(jvm);
+			if (path != null) {
+				File[] vmFiles = new File(path).listFiles();
+				if (vmFiles != null) {
+					for (File vmdir : vmFiles) {
+						JVM jvm = getJVM(vmdir);
+						if (jvm != null)
+							vms.add(jvm);
+					}
 				}
 			}
 		}
@@ -151,6 +157,12 @@ class MacOS extends Unix {
 
 		File contents = new File(vmdir, "Contents");
 		if (!contents.isDirectory()) {
+			JVM jvm = _getJVMFromRTJar(vmdir);
+
+			if (jvm != null) {
+				return jvm;
+			}
+
 			logger.debug("Found a directory {}, but it does not have the expected Contents directory", vmdir);
 			return null;
 		}
@@ -192,6 +204,35 @@ class MacOS extends Unix {
 			logger.debug("Could not parse the Info.plist in {}", vmdir, e);
 			throw e;
 		}
+	}
+
+	private JVM _getJVMFromRTJar(File vmdir) throws Exception {
+		File rtJar = new File(vmdir, "lib/rt.jar");
+
+		if (rtJar.exists()) {
+			try (JarFile jarFile = new JarFile(rtJar)) {
+				File vm = vmdir.getCanonicalFile();
+
+				JVM jvm = new JVM();
+				jvm.name = vm.getName();
+				jvm.path = vm.getCanonicalPath();
+				jvm.platformRoot = vm.getCanonicalPath();
+
+				Manifest manifest = jarFile.getManifest();
+				Attributes attrs = manifest.getMainAttributes();
+				jvm.version = attrs.getValue("Specification-Version");
+				jvm.platformVersion = attrs.getValue("Implementation-Version");
+				jvm.vendor = attrs.getValue("Specification-Vendor");
+
+				return jvm;
+			}
+			catch (Exception e) {
+				logger.debug("Could not get versions from rt.jar {}", vmdir, e);
+				throw e;
+			}
+		}
+
+		return null;
 	}
 
 	private String getSiblingValue(Node node) {
