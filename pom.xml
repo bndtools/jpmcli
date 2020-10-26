@@ -73,12 +73,12 @@
 		<dependency>
 			<groupId>biz.aQute.bnd</groupId>
 			<artifactId>biz.aQute.bndlib</artifactId>
-			<version>4.0.0</version>
+			<version>5.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>biz.aQute.bnd</groupId>
 			<artifactId>biz.aQute.repository</artifactId>
-			<version>4.0.0</version>
+			<version>5.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -118,7 +118,7 @@
 			<plugin>
 				<groupId>biz.aQute.bnd</groupId>
 				<artifactId>bnd-maven-plugin</artifactId>
-				<version>4.0.0</version>
+				<version>5.2.0</version>
 				<executions>
 					<execution>
 						<id>default-bnd-process</id>
