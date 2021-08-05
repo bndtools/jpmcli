@@ -17,7 +17,10 @@ import java.util.Collection;
 import java.util.Formatter;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.boris.winrun4j.RegistryKey;
 import org.slf4j.Logger;
@@ -381,6 +384,48 @@ public class Windows extends Platform {
 		findJavaHomes(vms, JRE_KEY_PREFIX);
 		findJavaHomes(vms, JDK_KEY_PREFIX);
 		findJavaHomes(vms, JDK_11_KEY_PREFIX);
+
+		if (vms.isEmpty()) {
+			String javaHome = System.getenv("JAVA_HOME");
+
+			if (javaHome != null) {
+				JVM jvm = getJVM(new File(javaHome));
+
+				if (jvm != null) {
+					vms.add(jvm);
+				}
+			}
+			else {
+				Stream<String> paths =
+					Stream.of(System.getenv("PATH").split(Pattern.quote(File.pathSeparator)));
+
+				Optional<Path> optJavaPath = paths.map(
+					Paths::get
+				).map(
+					path -> path.resolve("java")
+				).filter(
+					Files::exists
+				).findFirst();
+
+				if (optJavaPath.isPresent()) {
+					Path javaPath = optJavaPath.get();
+
+					while (Files.isSymbolicLink(javaPath)) {
+						javaPath = Files.readSymbolicLink(javaPath);
+					}
+
+					File javaExe = javaPath.toFile();
+
+					File javaParent = javaExe.getParentFile().getParentFile();
+
+					JVM jvm = getJVM(javaParent);
+
+					if (jvm != null) {
+						vms.add(jvm);
+					}
+				}
+			}
+		}
 	}
 
 	private void findJavaHomes(Collection<JVM> vms, String prefix) throws Exception {
