@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>biz.aQute.bnd</groupId>
 	<artifactId>biz.aQute.jpm.run</artifactId>
 	<description>Just Another Package Manager for Java</description>
 	<name>${project.groupId}:${project.artifactId}</name>
-	<version>${revision}</version>
+	<version>4.0.0</version>
 
 	<properties>
 		<revision>4.0.0-SNAPSHOT</revision>
@@ -32,7 +31,8 @@
 		<url>https://github.com/bndtools/jpmcli</url>
 		<connection>scm:git:https://github.com/bndtools/jpmcli.git</connection>
 		<developerConnection>scm:git:git@github.com:bndtools/jpmcli.git</developerConnection>
-	</scm>
+	  <tag>4.0.0</tag>
+  </scm>
 	<developers>
 		<developer>
 			<id>pkriens</id>
